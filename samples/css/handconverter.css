@@ -1,0 +1,126 @@
+.hand-content {
+    font-size: 15px
+}
+
+.hand-content .section {
+    border-radius: 7px;
+    background-clip: padding-box;
+    background: #f5f7f8;
+    left: -2%;
+    margin: 1% 0;
+    overflow: hidden;
+    position: relative;
+    width: 104%
+}
+
+.hand-content .street-text {
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 200;
+    word-wrap: break-word;
+    padding: 10px 0
+}
+
+.hand-content .game-title {
+    display: block
+}
+
+.hand-content .game-blinds {
+    font-weight: bold
+}
+
+.hand-content .title-block, .hand-content .street {
+    font-size: 14px;
+    padding: 8px 13px
+}
+
+.hand-content .street {
+    padding: 12px 114px 12px 15px
+}
+
+.hand-content .street.border {
+    border-top: 1px solid #d4d3d3;
+    padding-top: 10px
+}
+
+.hand-content .street-title {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1d2020
+}
+
+.hand-content .street-money {
+    display: inline-block;
+    font-size: 12px;
+    margin-right: 10px;
+    vertical-align: middle;
+    color: #5f5f5f
+}
+
+.hand-content .street-players {
+    display: inline-block;
+    font-size: 12px;
+    font-style: italic;
+    margin-right: 10px;
+    vertical-align: middle;
+    color: #5f5f5f
+}
+
+.hand-content .card-value {
+    background-position: 12px 4px;
+    background-repeat: no-repeat;
+    background-size: auto 58%;
+    color: #333;
+    display: inline-block;
+    font-size: 14px;
+    margin: -3px 2px 2px;
+    padding-right: 17px;
+    font-weight: 500;
+    min-width: 12px
+}
+
+.hand-content .card-value.heart {
+    background-image: url("../img/partials/hand_history-detail/heart.4c3661396f35.png");
+    padding-right: 18px
+}
+
+.hand-content .card-value.diamond {
+    background-image: url("../img/partials/hand_history-detail/diamond.02045742a3e8.png");
+    padding-right: 13px
+}
+
+.hand-content .card-value.spade {
+    background-image: url("../img/partials/hand_history-detail/spade.a45746103413.png")
+}
+
+.hand-content .card-value.club {
+    background-image: url("../img/partials/hand_history-detail/club.33c33b8a0a9b.png")
+}
+
+.hand-content .street-action {
+    color: #5f5f5f
+}
+
+.hand-content .street-action.primary {
+    color: #a81313
+}
+
+.hand-content .street-action.primary .seat-name {
+    color: #a81313;
+    font-weight: bold
+}
+
+.hand-content .seat-name {
+    color: #5f5f5f
+}
+
+.hand-content .seat-name.primary {
+    color: #a81313;
+    font-weight: bold
+}
+
+.hand-content .game-rake {
+    color: #5f5f5f;
+    display: block
+}
