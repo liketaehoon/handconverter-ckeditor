@@ -1,7 +1,10 @@
 function createElement(editor, tagName, className, text, parent) {
   var element = editor.document.createElement(tagName);
   if(className){
-    element.addClass(className);
+    var classNames = className.split(' ');
+    for (var idx in classNames) {
+      element.addClass(classNames[idx]);
+    }
   }
   if(text) {
     element.appendHtml(text);
@@ -29,24 +32,6 @@ function generateGameTitle(editor, history, mainDom) {
 
   // var blinds = historyRows.rows[0];
 
-
-
-  var section = createElement(editor, 'div', 'section', null, mainDom);
-  var titleBlock = createElement(editor, 'div', 'title-block', null, section);
-  var gameTitle = createElement(editor, 'span', 'game-title', null, titleBlock);
-  createElement(editor, 'span', 'game-blinds', 'Blinds: ' + blind, gameTitle);
-  gameTitle.appendText(' (6 Players)');
-  createElement(editor, 'span', 'seat-name', 'BN: $127.57', titleBlock);
-  createElement(editor, 'br', null, null, titleBlock);
-  createElement(editor, 'span', 'seat-name', 'SB: $207.99', titleBlock);
-  createElement(editor, 'br', null, null, titleBlock);
-  createElement(editor, 'span', 'seat-name', '<strong>BB: $169.50</strong>', titleBlock);
-  createElement(editor, 'br', null, null, titleBlock);
-  createElement(editor, 'span', 'seat-name', '<strong>UTG: $486.95 (Hero)</strong>', titleBlock);
-  createElement(editor, 'br', null, null, titleBlock);
-  createElement(editor, 'span', 'seat-name', 'MP: $145.42', titleBlock);
-  createElement(editor, 'br', null, null, titleBlock);
-  createElement(editor, 'span', 'seat-name', 'CO: $107.90', titleBlock);
 }
 
 CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
@@ -120,11 +105,15 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
       console.log(dialog);
       console.log(dialog.element);
       globalDialog = dialog;
+
+
       var main = createElement(editor, 'section', 'hand-content', null, null);
       var handHistory = createElement(editor, 'div', 'hand-history', null, main);
-      var historyRaw = dialog.getValueOf( 'main', 'history' ).trim();
-      var historyRows = { raw : historyRaw , rows : dialog.getValueOf( 'main', 'history' ).trim().split('\n'), proccessed : 0 };
-      generateGameTitle(editor,historyRows, handHistory);
+      var rawHistory = dialog.getValueOf( 'main', 'history' ).trim();
+      var detector = new PokerRoomDetector();
+      var parser = detector.detect(rawHistory);
+      var data = parser.parse(rawHistory);
+      new Renderer().render(editor, main, data);
       editor.insertElement( main );
     }
   };
@@ -181,3 +170,88 @@ Seat 6: justtme folded on the Turn
 
 
 */
+
+var Renderer = function() {};
+Renderer.prototype.render = function(editor, mainDom, data) {
+  var section = createElement(editor, 'div', 'section', null, mainDom);
+  var titleBlock = createElement(editor, 'div', 'title-block', null, section);
+  var gameTitle = createElement(editor, 'span', 'game-title', null, titleBlock);
+  createElement(editor, 'span', 'game-blinds', 'Blinds: ' + data.info.blinds, gameTitle);
+  gameTitle.appendText(' ('+data.info.player_number+' Players)');
+
+  for (var idx in data.players) {
+    var player = data.players[idx];
+
+    var content = player.position+': '+player.stack;
+    if(player.is_hero) {
+      content += ' (Hero)';
+    }
+
+    if(player.is_hero || player.has_action) {
+      content = '<strong>'+content+'</strong>';
+    }
+
+    createElement(editor, 'span', player.is_hero ? 'seat-name primary' : 'seat-name', content, titleBlock);
+    if(idx != (data.players.length-1)) {
+      createElement(editor, 'br', null, null, titleBlock);
+    }
+  }
+};
+
+var Pokerstars = function() { this.name  = 'Pokerstars'; };
+Pokerstars.prototype.parse = function(history) {
+
+  console.log(history);
+
+  var result = {};
+  var heroname= /Dealt to [A-Za-z0-9]*/g.exec(history)[0].replace('Dealt to ','').trim();
+  var smallplayer = /[A-z ]*: posts small blind \$[0-9.]*/g.exec(history)[0];
+  smallplayer = smallplayer.substring(0,smallplayer.indexOf(':')).trim();
+
+  var blinds =/\$[0-9.]*\/\$[0-9.]*/g.exec(history)[0];
+  var rexSeats = /Seat [1-9]:[ A-z0-9.]*\(\$[0-9.]* in chips\)/g;
+  var myArray;
+  var seats = [];
+  while ((myArray = rexSeats.exec(history)) !== null) {
+    seats.push(myArray[0]);
+  }
+
+  var players = [];
+  var postflop_txt = history.substring(history.indexOf('*** FLOP'), history.indexOf('*** SUMMARY'));
+  var smallidx = -1;
+  for (var seatIdx in seats) {
+    var seat = seats[seatIdx];
+    var player = {};
+    player.stack = /\$[0-9.]*/g.exec(seat)[0];
+    player.name=seat.substring(8,seat.indexOf('(')).trim();
+    player.is_hero = player.name == heroname;
+    player.has_action = postflop_txt.indexOf(player.name) > -1; // look into other history
+    players.push(player);
+
+    if (player.name == smallplayer) {
+      smallidx = seatIdx;
+    }
+  }
+
+  // TODO : need to be test with short handed
+  var position = [ 'SB', 'BB', 'UTG', 'MP', 'CO', 'BN'];
+  for ( var i = 0; i < players.length; i++ ){
+    var playerloop = players[(parseInt(smallidx) + parseInt(i))%players.length];
+    playerloop.position = position[i];
+  }
+
+  result.info = { blinds : blinds, player_number : seats.length};
+  result.players = players;
+  result.raw = history;
+  return result;
+};
+
+var PokerRoomDetector = function() {};
+PokerRoomDetector.prototype.detect = function(rawHistory) {
+  return new Pokerstars();
+};
+
+// for node unit testing
+// module.exports = {
+//   detector : new PokerRoomDetector()
+// };
