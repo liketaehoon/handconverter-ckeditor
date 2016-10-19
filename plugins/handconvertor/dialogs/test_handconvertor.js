@@ -44,7 +44,7 @@ var psOmahaHistory = 'PokerStars Zoom Hand #159780720453:  Omaha Pot Limit ($0.0
 'liketaehoon collected $18.71 from pot \n'+
 '*** SUMMARY *** \n'+
 'Total pot $19.54 | Rake $0.83 \n'+
-'Board [Ad 7d 3c 6h 9d] \n'+
+'boards [Ad 7d 3c 6h 9d] \n'+
 'Seat 1: Odintsov Spb (button) folded before Flop (didn\'t bet) \n'+
 'Seat 2: bengozoli (small blind) folded before Flop \n'+
 'Seat 3: liketaehoon (big blind) showed [4c 3d 6s 5d] and won ($18.71) with a flush, Ace high \n'+
@@ -105,6 +105,54 @@ module.exports = {
 		test.equal(result.players[5].position, 'CO');
 		test.equal(result.players[5].is_hero, false);
 		test.equal(result.players[5].has_action, true);
+
+		test.equal(result.preflop.hero_position,'BB');
+		test.equal(result.preflop.hero_holecard,'4c 3d 6s 5d');
+		test.equal(result.preflop.actions.length,6);
+		test.equal(result.preflop.actions[0].content, "UTG raises to $0.35");
+		test.equal(result.preflop.actions[1].content, "MP folds");
+		test.equal(result.preflop.actions[2].content, "CO calls $0.35");
+		test.equal(result.preflop.actions[3].content, "BN folds");
+		test.equal(result.preflop.actions[4].content, "SB folds");
+		test.equal(result.preflop.actions[5].content, "Hero calls $0.25");
+
+		test.equal(result.flop.actions.length,4);
+		test.equal(result.flop.boards,'Ad 7d 3c');
+		test.equal(result.flop.actions[0].content, "Hero checks");
+		test.equal(result.flop.actions[1].content, "UTG bets $0.40");
+		test.equal(result.flop.actions[2].content, "CO calls $0.40");
+		test.equal(result.flop.actions[3].content, "Hero calls $0.40");
+
+		test.equal(result.turn.actions.length,3);
+		test.equal(result.turn.boards,'Ad 7d 3c 6h');
+		test.equal(result.turn.actions[0].content, "Hero bets $2.20");
+		test.equal(result.turn.actions[1].content, "UTG calls $2.20");
+		test.equal(result.turn.actions[2].content, "CO folds");
+
+		test.equal(result.river.actions.length,3);
+		test.equal(result.river.boards,'Ad 7d 3c 6h 9d');
+		test.equal(result.river.actions[0].content, "Hero checks");
+		test.equal(result.river.actions[1].content, "UTG bets $6.42");
+		test.equal(result.river.actions[2].content, "Hero calls $6.42");
+
+		test.equal(result.summary.results.length,3);
+		test.equal(result.summary.results[0].content, "Hero won ($18.71) with a flush, Ace high");
+		test.equal(result.summary.results[1].content, "UTG lost with three of a kind, Aces");
+		test.equal(result.summary.results[2].content, "Rake $0.83");
+		test.done();
+	},
+	testPokerStarsPLOPot : function(test) {
+
+		var parser = handconvertor.detector.detect(psOmahaHistory);
+		test.ok(parser !== null);
+		test.equal(parser.name , 'Pokerstars');
+		var result = parser.parse(psOmahaHistory);
+		test.equal(result.pots.length, 5);
+		test.equal(result.pots[0], 0.15); // pre 0.95
+		test.equal(result.pots[1], 1.10); // flop 1.2
+		test.equal(result.pots[2], 2.30); // turn 4.4
+		test.equal(result.pots[3], 6.70); // river 12.84
+		test.equal(result.pots[4], 19.54); // final
 
 		test.done();
 	}

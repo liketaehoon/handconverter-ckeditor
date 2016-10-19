@@ -198,23 +198,122 @@ Renderer.prototype.render = function(editor, mainDom, data) {
   }
 };
 
+function CommonParser() {}
+CommonParser.prototype.regExMultiple = function(regEx, contents) {
+  var myArray;
+  var results = [];
+  while ((myArray = regEx.exec(contents)) !== null) {
+    results.push(myArray[0]);
+  }
+  return results;
+};
+CommonParser.prototype.actionConvert = function(action, players) {
+  var result = action.replace(':', '');
+  result = this.replacePlayerName(result, players);
+  // simplify raise action
+  if(action.indexOf('raises') > -1) {
+    var splits = action.split(' ');
+    result = result.replace(splits[3] + ' ', '');
+  }
+  return result.trim();
+};
+
+CommonParser.prototype.replacePlayerName = function(text, players) {
+  for(var playerIdx in players) {
+    var player = players[playerIdx];
+    if(player.is_hero) {
+      text = text.replace(player.name, 'Hero');
+    }
+    else {
+      text = text.replace(player.name, player.position);
+    }
+  }
+  return text;
+};
+
 var Pokerstars = function() { this.name  = 'Pokerstars'; };
+Pokerstars.prototype = new CommonParser();
+Pokerstars.prototype.parsePot = function(history, players) {
+
+  var result = [];
+  var sum = 0.0;
+
+  var splits = history.split('\n');
+
+  for(var idx in splits) {
+    var row = splits[idx];
+    var moneys;
+    // player 이름에 check/bet 등이 있는 경우를 대비해서 치환.
+    row = this.replacePlayerName(row, players);
+
+    if (row.indexOf('posts small blind') > -1) {
+      moneys = this.regExMultiple(/\$[0-9.]*/g, row)[0];
+      sum += parseFloat(moneys.replace('$',''));
+    }
+    else if (row.indexOf('posts big blind') > -1) {
+        moneys = this.regExMultiple(/\$[0-9.]*/g, row)[0];
+        sum += parseFloat(moneys.replace('$',''));
+        result.push(sum.toFixed(2));
+    }
+    else if(row.indexOf('raises') > -1) {
+        moneys = this.regExMultiple(/\$[0-9.]*/g, row)[1];
+        sum += parseFloat(moneys.replace('$',''));
+    }
+    else if(row.indexOf('bets') > -1 || row.indexOf('call') > -1) {
+        moneys = this.regExMultiple(/\$[0-9.]*/g, row)[0];
+        sum += parseFloat(moneys.replace('$',''));
+    }
+    else if (row.indexOf('*** FLOP ***') > -1){
+      result.push(sum.toFixed(2));
+    }
+    else if (row.indexOf('*** TURN ***') > -1){
+      result.push(sum.toFixed(2));
+    }
+    else if (row.indexOf('*** RIVER ***') > -1){
+      result.push(sum.toFixed(2));
+    }
+    else if (row.indexOf('*** SHOW DOWN ***') > -1){
+      result.push(sum.toFixed(2));
+      break;
+    }
+    continue;
+  }
+  return result;
+};
+
+Pokerstars.prototype.parseActions = function(rows, players) {
+  var actions = [];
+  for(var idx in rows) {
+    var pfAction = rows[idx];
+    if (pfAction.trim().length < 1) {
+      continue;
+    }
+    actions.push({ content : this.actionConvert(pfAction, players)});
+  }
+  return actions;
+};
+Pokerstars.prototype.parseBoard = function(row) {
+  var holecards = this.regExMultiple(/[0-9ATJKQ][(s|c|d|h)]/g, row);
+  return holecards.join(' ');
+};
 Pokerstars.prototype.parse = function(history) {
 
   console.log(history);
 
   var result = {};
+  result.preflop = {};
+  result.flop = {};
+  result.turn = {};
+  result.river = {};
+  result.summary = {};
+  result.summary.results = [];
+  result.raw = history;
   var heroname= /Dealt to [A-Za-z0-9]*/g.exec(history)[0].replace('Dealt to ','').trim();
   var smallplayer = /[A-z ]*: posts small blind \$[0-9.]*/g.exec(history)[0];
   smallplayer = smallplayer.substring(0,smallplayer.indexOf(':')).trim();
 
   var blinds =/\$[0-9.]*\/\$[0-9.]*/g.exec(history)[0];
-  var rexSeats = /Seat [1-9]:[ A-z0-9.]*\(\$[0-9.]* in chips\)/g;
-  var myArray;
-  var seats = [];
-  while ((myArray = rexSeats.exec(history)) !== null) {
-    seats.push(myArray[0]);
-  }
+  var seats = this.regExMultiple(/Seat [1-9]:[ A-z0-9.]*\(\$[0-9.]* in chips\)/g, history);
 
   var players = [];
   var postflop_txt = history.substring(history.indexOf('*** FLOP'), history.indexOf('*** SUMMARY'));
@@ -238,13 +337,72 @@ Pokerstars.prototype.parse = function(history) {
   for ( var i = 0; i < players.length; i++ ){
     var playerloop = players[(parseInt(smallidx) + parseInt(i))%players.length];
     playerloop.position = position[i];
+    if(playerloop.is_hero) {
+      result.preflop.hero_position = position[i];
+    }
   }
 
   result.info = { blinds : blinds, player_number : seats.length};
   result.players = players;
-  result.raw = history;
+
+  // preflop
+  var preflop_txt = history.substring(history.indexOf('*** HOLE CARDS'), history.indexOf('*** FLOP'));
+  var preflop_rows = preflop_txt.split('\n');
+  var holecards = this.regExMultiple(/[0-9ATJKQ][(s|c|d|h)]/g, preflop_rows[1]);
+  result.preflop.hero_holecard = holecards.join(' ');
+  result.preflop.actions = [];
+  result.preflop.actions = this.parseActions(preflop_rows.slice(2,preflop_rows.length), result.players);
+
+  // flop
+  var floptext = history.substring(history.indexOf('*** FLOP'), history.indexOf('*** TURN'));
+  var floprows = floptext.split('\n');
+  result.flop.boards = this.parseBoard(floprows[0]);
+  result.flop.actions = this.parseActions(floprows.slice(1,floprows.length), result.players);
+  // turn
+  var turntext = history.substring(history.indexOf('*** TURN'), history.indexOf('*** RIVER'));
+  var turnrows = turntext.split('\n');
+  result.turn.boards = this.parseBoard(turnrows[0]);
+  result.turn.actions = this.parseActions(turnrows.slice(1,turnrows.length), result.players);
+  // river
+  var rivertext = history.substring(history.indexOf('*** RIVER'), history.indexOf('*** SHOW'));
+  var riverrows = rivertext.split('\n');
+  result.river.boards = this.parseBoard(riverrows[0]);
+  result.river.actions = this.parseActions(riverrows.slice(1,riverrows.length), result.players);
+  // pot calcuration
+  result.pots = this.parsePot(history, players);
+
+  var summarytext = history.substring(history.indexOf('*** SUMMARY'), history.length);
+  var summaryrows = summarytext.split('\n');
+  for (var summaryIdx in summaryrows) {
+    var summaryrow = summaryrows[summaryIdx];
+    if(summaryrow.indexOf('won') > -1 || summaryrow.indexOf('lost') > -1) {
+      var summaryPosition;
+      for(var playerIdx in result.players) {
+        var summaryPlayer = result.players[playerIdx];
+        if(summaryrow.indexOf(summaryPlayer.name) > 0) {
+          if(summaryPlayer.is_hero) {
+            summaryPosition = 'Hero';
+          }
+          else {
+            summaryPosition = summaryPlayer.position;
+          }
+          break;
+        }
+      }
+      var txt = summaryPosition + ' ';
+      if(summaryrow.indexOf('won') > -1) {
+        txt += summaryrow.substring(summaryrow.indexOf('won'), summaryrow.length) ;
+      }
+      else if(summaryrow.indexOf('lost') > -1) {
+        txt += summaryrow.substring(summaryrow.indexOf('lost'), summaryrow.length) ;
+      }
+      result.summary.results.push({ content : txt.trim()});
+    }
+  }
+  result.summary.results.push({ content : this.regExMultiple(/Rake \$[0-9.]*/g, summarytext)[0] });
   return result;
 };
+
 
 var PokerRoomDetector = function() {};
 PokerRoomDetector.prototype.detect = function(rawHistory) {
@@ -252,6 +410,8 @@ PokerRoomDetector.prototype.detect = function(rawHistory) {
 };
 
 // for node unit testing
-// module.exports = {
-//   detector : new PokerRoomDetector()
-// };
+if(module) {
+  module.exports = {
+    detector : new PokerRoomDetector()
+  };
+}
