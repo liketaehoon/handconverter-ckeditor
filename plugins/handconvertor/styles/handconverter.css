@@ -81,21 +81,21 @@
 }
 
 .hand-content .card-value.heart {
-    background-image: url("../img/partials/hand_history-detail/heart.4c3661396f35.png");
+    background-image: url("../icons/heart.4c3661396f35.png");
     padding-right: 18px
 }
 
 .hand-content .card-value.diamond {
-    background-image: url("../img/partials/hand_history-detail/diamond.02045742a3e8.png");
+    background-image: url("../icons/diamond.02045742a3e8.png");
     padding-right: 13px
 }
 
 .hand-content .card-value.spade {
-    background-image: url("../img/partials/hand_history-detail/spade.a45746103413.png")
+    background-image: url("../icons/spade.a45746103413.png")
 }
 
 .hand-content .card-value.club {
-    background-image: url("../img/partials/hand_history-detail/club.33c33b8a0a9b.png")
+    background-image: url("../icons/club.33c33b8a0a9b.png")
 }
 
 .hand-content .street-action {

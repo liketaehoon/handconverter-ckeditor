@@ -172,9 +172,79 @@ Seat 6: justtme folded on the Turn
 */
 
 var Renderer = function() {};
+Renderer.prototype.renderCards = function(editor, dom, holecards) {
+
+  var splits = holecards.split(' ');
+  for(var idx in splits) {
+    var card = splits[idx];
+    switch(card[1]) {
+      case 'c' :
+        createElement(editor,'span', 'card-value club', card[0], dom);
+        break;
+      case 'd' :
+        createElement(editor,'span', 'card-value diamond', card[0], dom);
+        break;
+      case 'h' :
+        createElement(editor,'span', 'card-value heart', card[0], dom);
+        break;
+      case 's' :
+        createElement(editor,'span', 'card-value spade', card[0], dom);
+        break;
+    }
+  }
+};
+
+Renderer.prototype.renderStreet = function(editor, dom, pot, streetData, streetName) {
+  var section = createElement(editor, 'div', 'section', null, dom);
+  var street = createElement(editor, 'div', 'street', null, section);
+  createElement(editor, 'span', 'street-title', streetName, street);
+  createElement(editor, 'span', 'street-money', "($"+pot+")", street);
+
+  if(streetData.hero_holecard) {
+    var heroHoleCard =  createElement(editor, 'span', '', null, street);
+    createElement(editor,'strong', '', 'Hero' , heroHoleCard);
+    heroHoleCard.appendHtml(' is ' + streetData.hero_position+ ' with ');
+    this.renderCards(editor,heroHoleCard, streetData.hero_holecard);
+  }
+  else if (streetData.boards) {
+    this.renderCards(editor,street, streetData.boards);
+  }
+  this.renderActions(editor,street, streetData.actions);
+  createElement(editor, 'br', '', null, dom);
+};
+
+Renderer.prototype.renderActions = function(editor, dom, actions) {
+  var actionWrapper = createElement(editor, 'div', 'actions_wrapper', null, dom);
+  var actionsDiv = createElement(editor, 'div', 'actions', null, actionWrapper);
+  for(var idx in actions) {
+    var action = actions[idx];
+    var is_primary = false;
+    var actionClass = 'street-action';
+    if(action.content.indexOf('Hero') > -1) {
+      actionClass = 'street-action primary';
+    }
+    else if(action.content.indexOf('bet') > -1) {
+      actionClass = 'street-action primary';
+    }
+    else if(action.content.indexOf('raises') > -1) {
+      actionClass = 'street-action primary';
+    }
+    var position = action.content.substring(0,action.content.indexOf(' '));
+    var actionTxt = action.content.substring(action.content.indexOf(' '), action.content.length);
+
+    var streetAction = createElement(editor,'span', actionClass, null, actionsDiv);
+    var seatName = createElement(editor,'span', 'seat-name', null, streetAction);
+    createElement(editor,'strong', '', position, seatName);
+    createElement(editor,'span', 'value-container', actionTxt, streetAction);
+
+    if(idx != actions.length-1) {
+      createElement(editor,'span', 'seperator', ', ', streetAction);
+    }
+  }
+};
 Renderer.prototype.render = function(editor, mainDom, data) {
-  var section = createElement(editor, 'div', 'section', null, mainDom);
-  var titleBlock = createElement(editor, 'div', 'title-block', null, section);
+  var blindSection = createElement(editor, 'div', 'section', null, mainDom);
+  var titleBlock = createElement(editor, 'div', 'title-block', null, blindSection);
   var gameTitle = createElement(editor, 'span', 'game-title', null, titleBlock);
   createElement(editor, 'span', 'game-blinds', 'Blinds: ' + data.info.blinds, gameTitle);
   gameTitle.appendText(' ('+data.info.player_number+' Players)');
@@ -194,6 +264,28 @@ Renderer.prototype.render = function(editor, mainDom, data) {
     createElement(editor, 'span', player.is_hero ? 'seat-name primary' : 'seat-name', content, titleBlock);
     if(idx != (data.players.length-1)) {
       createElement(editor, 'br', null, null, titleBlock);
+    }
+  }
+  createElement(editor, 'br', '', null, mainDom);
+
+  this.renderStreet(editor,mainDom, data.pots[0], data.preflop, 'PreFlop');
+  if(data.flop) {
+    this.renderStreet(editor,mainDom, data.pots[1], data.flop, 'Flop');
+  }
+  if(data.turn) {
+    this.renderStreet(editor,mainDom, data.pots[2], data.turn, 'Turn');
+  }
+  if(data.river) {
+    this.renderStreet(editor,mainDom, data.pots[3], data.river, 'River');
+  }
+  if(data.summary) {
+    var section = createElement(editor, 'div', 'section', null, mainDom);
+    var street = createElement(editor, 'div', 'street', null, section);
+    createElement(editor, 'span', 'street-title', 'Final Pot', street);
+    for(var summaryIdx in data.summary.results) {
+      var result = data.summary.results[summaryIdx];
+      createElement(editor,'span', 'street-action', result.content, street);
+      createElement(editor,'br', '', null, street);
     }
   }
 };
