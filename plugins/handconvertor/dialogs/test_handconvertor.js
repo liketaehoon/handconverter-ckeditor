@@ -326,5 +326,11 @@ module.exports = {
 			test.equal(result.pots[4], 0.68); // final
 		}
 		test.done();
-	}
+	},
+	testPartialExpectError : function(test) {
+
+	},
+	testACRNLHE : function(test) {
+
+	},
 };
