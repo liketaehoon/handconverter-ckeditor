@@ -250,10 +250,9 @@ CommonParser.prototype.regExMultiple = function(regEx, contents) {
 CommonParser.prototype.actionConvert = function(action, players) {
   var result = action.replace(':', '');
   result = this.replacePlayerName(result, players);
-  // simplify raise action
-  if(action.indexOf('raises') > -1) {
-    var splits = action.split(' ');
-    result = result.replace(splits[3] + ' ', '');
+  if(result.indexOf('raises') > -1) {
+    var splits = result.split(' ');
+    result = result.replace(splits[2] + ' ', '');
   }
   return result.trim();
 };
@@ -363,12 +362,13 @@ Pokerstars.prototype.parse = function(history) {
   result.summary = {};
   result.summary.results = [];
   result.raw = history;
-  var heroname= /Dealt to [A-Za-z0-9]*/g.exec(history)[0].replace('Dealt to ','').trim();
-  var smallplayer = /[A-z0-9 ]*: posts small blind \$[0-9.]*/g.exec(history)[0];
+  var dealt_text = /Dealt to .* \[/g.exec(history)[0];
+  var heroname = dealt_text.substring(0,dealt_text.length-1).replace('Dealt to ','').trim();
+  var smallplayer = /.*: posts small blind \$[0-9.]*/g.exec(history)[0];
   smallplayer = smallplayer.substring(0,smallplayer.indexOf(':')).trim();
 
   var blinds =/\$[0-9.]*\/\$[0-9.]*/g.exec(history)[0];
-  var seats = this.regExMultiple(/Seat [1-9]:[ A-z0-9.]*\(\$[0-9.]* in chips\)/g, history);
+  var seats = this.regExMultiple(/Seat [1-9]:.*\(\$[0-9.]* in chips\)/g, history);
 
   var players = [];
   var postflop_txt = history.substring(history.indexOf('*** FLOP'), history.indexOf('*** SUMMARY'));
@@ -390,6 +390,9 @@ Pokerstars.prototype.parse = function(history) {
   var position = [ 'SB', 'BB', 'UTG', 'MP', 'CO', 'BN'];
   if(players.length == 2) {
     position = [ 'BN/SB', 'BB' ];
+  }
+  else if(players.length == 9) {
+    position = [ 'SB', 'BB', 'UTG', 'UTG+1', 'MP', 'MP+1', 'MP+2', 'CO', 'BN' ];
   }
   for ( var i = 0; i < players.length; i++ ){
     var playerloop = players[(parseInt(smallidx) + parseInt(i))%players.length];

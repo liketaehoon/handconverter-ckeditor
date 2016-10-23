@@ -208,5 +208,123 @@ module.exports = {
 			test.equal(result.pots[4], 0.20); // final
 		}
 		test.done();
+	},
+	testPokerStarsFullingNLHE : function(test) {
+		var history = fs.readFileSync('./hands/fullring_nlhe', 'utf-8');
+		var parser = handconvertor.detector.detect(history);
+		test.ok(parser !== null);
+		test.equal(parser.name , 'Pokerstars');
+
+		var result = parser.parse(history);
+
+		test.equal(result.info.blinds, '$0.01/$0.02');
+		test.equal(result.info.player_number, 9);
+		test.equal(result.players.length,9);
+
+		test.equal(result.players[0].name, 'PZR-W');
+		test.equal(result.players[0].stack, '$2.60');
+		test.equal(result.players[0].position, 'BN');
+		test.equal(result.players[0].is_hero, false);
+		test.equal(result.players[0].has_action, false);
+
+		test.equal(result.players[1].name, 'liketaehoon');
+		test.equal(result.players[1].stack, '$2');
+		test.equal(result.players[1].position, 'SB');
+		test.equal(result.players[1].is_hero, true);
+		test.equal(result.players[1].has_action, true);
+
+
+		test.equal(result.players[2].name, 'Jeime_Lan');
+		test.equal(result.players[2].stack, '$2.07');
+		test.equal(result.players[2].position, 'BB');
+		test.equal(result.players[2].is_hero, false);
+		test.equal(result.players[2].has_action, false);
+
+
+		test.equal(result.players[3].name, 'Perez0107');
+		test.equal(result.players[3].stack, '$2.28');
+		test.equal(result.players[3].position, 'UTG');
+		test.equal(result.players[3].is_hero, false);
+		test.equal(result.players[3].has_action, false);
+
+		test.equal(result.players[4].name, 'iGelly');
+		test.equal(result.players[4].stack, '$2.59');
+		test.equal(result.players[4].position, 'UTG+1');
+		test.equal(result.players[4].is_hero, false);
+		test.equal(result.players[4].has_action, true);
+
+
+		test.equal(result.players[5].name, 'H!TM@N1989');
+		test.equal(result.players[5].stack, '$2');
+		test.equal(result.players[5].position, 'MP');
+		test.equal(result.players[5].is_hero, false);
+		test.equal(result.players[5].has_action, false);
+
+
+		test.equal(result.players[6].name, 'Spoonerrull');
+		test.equal(result.players[6].stack, '$1.32');
+		test.equal(result.players[6].position, 'MP+1');
+		test.equal(result.players[6].is_hero, false);
+		test.equal(result.players[6].has_action, false);
+
+
+		test.equal(result.players[7].name, 'gonzo799');
+		test.equal(result.players[7].stack, '$1.77');
+		test.equal(result.players[7].position, 'MP+2');
+		test.equal(result.players[7].is_hero, false);
+		test.equal(result.players[7].has_action, false);
+
+
+		test.equal(result.players[8].name, 'puurwart');
+		test.equal(result.players[8].stack, '$0.97');
+		test.equal(result.players[8].position, 'CO');
+		test.equal(result.players[8].is_hero, false);
+		test.equal(result.players[8].has_action, false);
+
+
+		test.equal(result.preflop.hero_position,'SB');
+		test.equal(result.preflop.hero_holecard,'9c 7c');
+		test.equal(result.preflop.actions.length,9);
+		test.equal(result.preflop.actions[0].content, "UTG folds");
+		test.equal(result.preflop.actions[1].content, "UTG+1 raises to $0.05");
+		test.equal(result.preflop.actions[2].content, "MP folds");
+		test.equal(result.preflop.actions[3].content, "MP+1 folds");
+		test.equal(result.preflop.actions[4].content, "MP+2 folds");
+		test.equal(result.preflop.actions[5].content, "CO folds");
+		test.equal(result.preflop.actions[6].content, "BN folds");
+		test.equal(result.preflop.actions[7].content, "Hero calls $0.04");
+		test.equal(result.preflop.actions[8].content, "BB folds");
+
+		test.equal(result.flop.actions.length,3);
+		test.equal(result.flop.boards,'5d Jc Ac');
+		test.equal(result.flop.actions[0].content, "Hero checks");
+		test.equal(result.flop.actions[1].content, "UTG+1 bets $0.08");
+		test.equal(result.flop.actions[2].content, "Hero calls $0.08");
+
+		test.equal(result.turn.actions.length,3);
+		test.equal(result.turn.boards,'5d Jc Ac 5c');
+		test.equal(result.turn.actions[0].content, "Hero checks");
+		test.equal(result.turn.actions[1].content, "UTG+1 bets $0.20");
+		test.equal(result.turn.actions[2].content, "Hero calls $0.20");
+
+		test.equal(result.river.actions.length,2);
+		test.equal(result.river.boards,'5d Jc Ac 5c Ts');
+		test.equal(result.river.actions[0].content, "Hero checks");
+		test.equal(result.river.actions[1].content, "UTG+1 checks");
+
+		test.equal(result.summary.results.length,2);
+		if(result.summary.results.length == 2) {
+			test.equal(result.summary.results[0].content, "Hero won ($0.66) with a flush, Ace high");
+			test.equal(result.summary.results[1].content, "Rake $0.02");
+		}
+		test.equal(result.pots.length, 5);
+		if(result.pots.length == 5) {
+			test.equal(result.pots[0], 0.03); // pre
+			test.equal(result.pots[1], 0.12); // flop
+			test.equal(result.pots[2], 0.28); // turn
+			test.equal(result.pots[3], 0.68); // river
+			test.equal(result.pots[4], 0.68); // final
+		}
+		test.done();
 	}
 };
