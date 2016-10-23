@@ -5,8 +5,8 @@ CKEDITOR =
 	}
 };
 
+var fs = require('fs');
 var handconvertor = require('./handconvertor.js');
-
 var psOmahaHistory = 'PokerStars Zoom Hand #159780720453:  Omaha Pot Limit ($0.05/$0.10) - 2016/10/11 22:21:36 JST [2016/10/11 9:21:36 ET] \n'+
 'Table \'Eulalia\' 6-max Seat #1 is the button \n \n'+
 'Seat 1: Odintsov Spb ($10 in chips)  \n'+
@@ -54,10 +54,10 @@ var psOmahaHistory = 'PokerStars Zoom Hand #159780720453:  Omaha Pot Limit ($0.0
 
 module.exports = {
 	setUp : function(callback) {
+		this.detector = handconvertor.detector;
 		callback();
 	},
 	tearDown : function(callback) {
-		this.detector = handconvertor.detector;
 		callback();
 	},
 	testPokerStarsPLO : function(test) {
@@ -153,7 +153,60 @@ module.exports = {
 		test.equal(result.pots[2], 2.30); // turn 4.4
 		test.equal(result.pots[3], 6.70); // river 12.84
 		test.equal(result.pots[4], 19.54); // final
+		test.done();
+	},
+	testPokerStarsHeadsUp : function(test) {
+		var history = fs.readFileSync('./hands/headsup', 'utf-8');
+		var parser = handconvertor.detector.detect(history);
+		test.ok(parser !== null);
+		test.equal(parser.name , 'Pokerstars');
 
+		var result = parser.parse(history);
+		test.equal(result.info.blinds, '$0.05/$0.10');
+		test.equal(result.info.player_number, 2);
+		test.equal(result.players.length,2);
+
+		test.equal(result.players[0].name, 'TonySo999');
+		test.equal(result.players[0].stack, '$11.31');
+		test.equal(result.players[0].position, 'BN/SB');
+		test.equal(result.players[0].is_hero, false);
+		test.equal(result.players[0].has_action, true);
+
+		test.equal(result.players[1].name, 'liketaehoon');
+		test.equal(result.players[1].stack, '$10');
+		test.equal(result.players[1].position, 'BB');
+		test.equal(result.players[1].is_hero, true);
+		test.equal(result.players[1].has_action, true);
+
+
+		test.equal(result.preflop.hero_position,'BB');
+		test.equal(result.preflop.hero_holecard,'4h 8c Ts Jd');
+		test.equal(result.preflop.actions.length,2);
+		test.equal(result.preflop.actions[0].content, "BN/SB calls $0.05");
+		test.equal(result.preflop.actions[1].content, "Hero checks");
+
+		test.equal(result.flop.actions.length,3);
+		test.equal(result.flop.boards,'6h Kh Ks');
+		test.equal(result.flop.actions[0].content, "Hero checks");
+		test.equal(result.flop.actions[1].content, "BN/SB bets $0.10");
+		test.equal(result.flop.actions[2].content, "Hero folds");
+
+		test.equal(result.turn.actions, undefined );
+		test.equal(result.riveractions, undefined);
+
+		test.equal(result.summary.results.length,2);
+		if(result.summary.results.length == 2) {
+			test.equal(result.summary.results[0].content, "BN/SB collected ($0.19)");
+			test.equal(result.summary.results[1].content, "Rake $0.01");
+		}
+		test.equal(result.pots.length, 5);
+		if(result.pots.length == 5) {
+			test.equal(result.pots[0], 0.15); // pre
+			test.equal(result.pots[1], 0.20); // flop
+			test.equal(result.pots[2], 0.20); // turn
+			test.equal(result.pots[3], 0.20); // river
+			test.equal(result.pots[4], 0.20); // final
+		}
 		test.done();
 	}
 };
