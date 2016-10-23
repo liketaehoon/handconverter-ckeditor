@@ -169,7 +169,7 @@ Renderer.prototype.renderActions = function(editor, dom, actions) {
     var is_primary = false;
     var actionClass = 'street-action';
     if(action.content.indexOf('Hero') > -1) {
-      actionClass = 'street-action primary';
+      actionClass = 'street-action';
     }
     else if(action.content.indexOf('bet') > -1) {
       actionClass = 'street-action primary';
