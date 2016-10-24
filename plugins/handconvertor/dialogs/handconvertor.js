@@ -379,7 +379,12 @@ Pokerstars.prototype.parse = function(history) {
     player.stack = /\$[0-9.]*/g.exec(seat)[0];
     player.name=seat.substring(8,seat.indexOf('(')).trim();
     player.is_hero = player.name == heroname;
-    player.has_action = postflop_txt.indexOf(player.name) > -1; // look into other history
+    if(history.indexOf('*** FLOP') > -1) {
+      player.has_action = postflop_txt.indexOf(player.name) > -1; // look into other history
+    }
+    else {
+      player.has_action = false;
+    }
     players.push(player);
 
     if (player.name == smallplayer) {

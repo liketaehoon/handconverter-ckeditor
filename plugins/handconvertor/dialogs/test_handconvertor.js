@@ -327,8 +327,118 @@ module.exports = {
 		}
 		test.done();
 	},
-	testPartialExpectError : function(test) {
+	testPSFreeFold : function(test) {
 
+			var history = fs.readFileSync('./hands/pokerstars_free_fold', 'utf-8');
+			var parser = handconvertor.detector.detect(history);
+			test.ok(parser !== null);
+			test.equal(parser.name , 'Pokerstars');
+
+			var result = parser.parse(history);
+
+			test.equal(result.info.blinds, '$0.10/$0.25');
+			test.equal(result.info.player_number, 6);
+			test.equal(result.players.length,6);
+
+			test.equal(result.players[0].name, 'geert89');
+			test.equal(result.players[0].stack, '$64.68');
+			test.equal(result.players[0].position, 'BN');
+			test.equal(result.players[0].is_hero, false);
+			test.equal(result.players[0].has_action, false);
+
+			test.equal(result.players[1].name, 'liketaehoon');
+			test.equal(result.players[1].stack, '$62.86');
+			test.equal(result.players[1].position, 'SB');
+			test.equal(result.players[1].is_hero, true);
+			test.equal(result.players[1].has_action, false);
+
+
+			test.equal(result.players[2].name, 'SSSciakalaka');
+			test.equal(result.players[2].stack, '$54.21');
+			test.equal(result.players[2].position, 'BB');
+			test.equal(result.players[2].is_hero, false);
+			test.equal(result.players[2].has_action, false);
+
+
+			test.equal(result.players[3].name, 'WPROHU');
+			test.equal(result.players[3].stack, '$13.05');
+			test.equal(result.players[3].position, 'UTG');
+			test.equal(result.players[3].is_hero, false);
+			test.equal(result.players[3].has_action, false);
+
+			test.equal(result.players[4].name, 'whiteh_awk87');
+			test.equal(result.players[4].stack, '$14.33');
+			test.equal(result.players[4].position, 'MP');
+			test.equal(result.players[4].is_hero, false);
+			test.equal(result.players[4].has_action, false);
+
+
+			test.equal(result.players[5].name, 'tessuntiger');
+			test.equal(result.players[5].stack, '$29.91');
+			test.equal(result.players[5].position, 'CO');
+			test.equal(result.players[5].is_hero, false);
+			test.equal(result.players[5].has_action, false);
+
+
+			test.equal(result.preflop.hero_position,'SB');
+			test.equal(result.preflop.hero_holecard,'Jc Qh 8d 7h');
+			test.equal(result.preflop.actions.length,6);
+			test.equal(result.preflop.actions[0].content, "UTG folds");
+			test.equal(result.preflop.actions[1].content, "MP folds");
+			test.equal(result.preflop.actions[2].content, "CO folds");
+			test.equal(result.preflop.actions[3].content, "BN raises to $0.85");
+			test.equal(result.preflop.actions[4].content, "Hero folds");
+			test.equal(result.preflop.actions[5].content, "BB folds");
+
+			test.equal(result.flop.actions, undefined );
+			test.equal(result.turn.actions, undefined );
+			test.equal(result.river.actions, undefined );
+
+			test.equal(result.summary.results.length,2);
+			if(result.summary.results.length == 2) {
+				test.equal(result.summary.results[0].content, "BN collected ($0.60)");
+				test.equal(result.summary.results[1].content, "Rake $0");
+			}
+			test.equal(result.pots.length, 5);
+			if(result.pots.length == 5) {
+				test.equal(result.pots[0], 0.35); // pre
+				test.equal(result.pots[1], 0.35); // flop
+				test.equal(result.pots[2], 0.35); // turn
+				test.equal(result.pots[3], 0.35); // river
+				test.equal(result.pots[4], 0.35); // final
+			}
+			test.done();
+	},
+	testPartialExpectError : function(test) {
+			var history = fs.readFileSync('./hands/pokerstars_partial', 'utf-8');
+			var parser = handconvertor.detector.detect(history);
+			test.ok(parser !== null);
+			test.equal(parser.name , 'Pokerstars');
+
+			var result = null;
+			try {
+				result = parser.parse(history);
+			}
+			catch (e1) {
+			}
+			test.equal(result,null);
+			test.done();
+	},
+	testPartialNoSummary : function(test) {
+			var history = fs.readFileSync('./hands/pokerstars_partial_no_summary', 'utf-8');
+			var parser = handconvertor.detector.detect(history);
+			test.ok(parser !== null);
+			test.equal(parser.name , 'Pokerstars');
+
+			var result = null;
+			try {
+				result = parser.parse(history);
+			}
+			catch (e1) {
+				console.log(e1);
+			}
+			test.ok(result !== null);
+			test.done();
 	},
 	testACRNLHE : function(test) {
 
