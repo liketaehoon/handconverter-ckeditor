@@ -440,7 +440,116 @@ module.exports = {
 			test.ok(result !== null);
 			test.done();
 	},
-	testACRNLHE : function(test) {
+	testPokerStarsAnteGame : function(test) {
+			var history = fs.readFileSync('./hands/pokerstars_with_ante', 'utf-8');
+			var parser = handconvertor.detector.detect(history);
+			test.ok(parser !== null);
+			test.equal(parser.name , 'Pokerstars');
 
+			var result = null;
+			try {
+				result = parser.parse(history);
+			}
+			catch (e1) {
+				console.log(e1);
+			}
+			test.ok(result !== null);
+			test.done();
 	},
+	testPokerStarsMTT : function(test) {
+			var history = fs.readFileSync('./hands/pokerstars/mtt', 'utf-8');
+			var parser = handconvertor.detector.detect(history);
+			test.ok(parser !== null);
+			test.equal(parser.name , 'Pokerstars');
+
+			var result = null;
+			try {
+				result = parser.parse(history);
+			}
+			catch (e1) {
+				console.log(e1);
+			}
+			test.ok(result !== null);
+			test.done();
+	},
+	// testACRNLHE : function(test) {
+	// 			var history = fs.readFileSync('./hands/wpn_acr', 'utf-8');
+	// 			var parser = handconvertor.detector.detect(history);
+	// 			test.ok(parser !== null);
+	// 			test.equal(parser.name , 'WPN');
+	//
+	// 			var result = parser.parse(history);
+	//
+	// 			test.equal(result.info.blinds, '$0.05/$0.10');
+	// 			test.equal(result.info.player_number, 4);
+	// 			test.equal(result.players.length,4);
+	//
+	// 			test.equal(result.players[0].name, 'slivy');
+	// 			test.equal(result.players[0].stack, '$9.51');
+	// 			test.equal(result.players[0].position, 'BN');
+	// 			test.equal(result.players[0].is_hero, false);
+	// 			test.equal(result.players[0].has_action, true);
+	//
+	// 			test.equal(result.players[1].name, 'CrunkPro');
+	// 			test.equal(result.players[1].stack, '$10.24');
+	// 			test.equal(result.players[1].position, 'SB');
+	// 			test.equal(result.players[1].is_hero, false);
+	// 			test.equal(result.players[1].has_action, false);
+	//
+	//
+	// 			test.equal(result.players[2].name, 'IOPCHAN');
+	// 			test.equal(result.players[2].stack, '$10');
+	// 			test.equal(result.players[2].position, 'BB');
+	// 			test.equal(result.players[2].is_hero, true);
+	// 			test.equal(result.players[2].has_action, true);
+	//
+	//
+	// 			test.equal(result.players[3].name, 'AlwaysNutted');
+	// 			test.equal(result.players[3].stack, '$23.30');
+	// 			test.equal(result.players[3].position, 'CO');
+	// 			test.equal(result.players[3].is_hero, false);
+	// 			test.equal(result.players[3].has_action, false);
+	//
+	// 			test.equal(result.preflop.hero_position,'BB');
+	// 			test.equal(result.preflop.hero_holecard,'Kd As');
+	// 			test.equal(result.preflop.actions.length,5);
+	// 			test.equal(result.preflop.actions[0].content, "CO folds");
+	// 			test.equal(result.preflop.actions[1].content, "BN raises ($0.30)");
+	// 			test.equal(result.preflop.actions[2].content, "SB folds");
+	// 			test.equal(result.preflop.actions[3].content, "Hero raises ($0.95)");
+	// 			test.equal(result.preflop.actions[4].content, "BN calls");
+	//
+	// 			test.equal(result.flop.boards,"5h Kh 10d");
+	// 			test.equal(result.flop.actions.length,2);
+	// 			test.equal(result.flop.actions[0].content, "Hero bets ($1.20)");
+	// 			test.equal(result.flop.actions[1].content, "BN calls ($1.20)");
+	//
+	//
+	// 			test.equal(result.turn.boards,"5h Kh 10d Ah");
+	// 			test.equal(result.turn.actions.length,2);
+	// 			test.equal(result.turn.actions[0].content, "Hero bets ($2.20)");
+	// 			test.equal(result.turn.actions[1].content, "BN calls ($2.20)");
+	//
+	//
+	// 			test.equal(result.river.boards,"5h Kh 10d Ah Ks");
+	// 			test.equal(result.river.actions.length,2);
+	// 			test.equal(result.river.actions[0].content, "Hero allin ($5.55)");
+	// 			test.equal(result.river.actions[1].content, "BN folds");
+	//
+	// 			test.equal(result.summary.results.length,2);
+	// 			if(result.summary.results.length == 2) {
+	// 				test.equal(result.summary.results[0].content, "BN Loeses ($4.45)");
+	// 				test.equal(result.summary.results[0].content, "Hero collected ($4.06)");
+	// 				test.equal(result.summary.results[1].content, "Rake $0.30.");
+	// 			}
+	// 			test.equal(result.pots.length, 5);
+	// 			if(result.pots.length == 5) {
+	// 				test.equal(result.pots[0], 0.15); // pre
+	// 				test.equal(result.pots[1], 1.95); // flop
+	// 				test.equal(result.pots[2], 4.35); // turn
+	// 				test.equal(result.pots[3], 8.75); // river
+	// 				test.equal(result.pots[4], 8.75); // final
+	// 			}
+	// 			test.done();
+	// },
 };

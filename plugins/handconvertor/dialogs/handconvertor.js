@@ -48,53 +48,53 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
             minHeight: 500,
             rows : 30,
             id: 'history',
-            label: 'Raw 핸드 히스토리',
+            label: '핸드 히스토리를 써주세요.',
             validate: CKEDITOR.dialog.validate.notEmpty( "핸드를 입력해주세요." ),
             style:'height:500px',
-            'default' : 'PokerStars Zoom Hand #159780720453:  Omaha Pot Limit ($0.05/$0.10) - 2016/10/11 22:21:36 JST [2016/10/11 9:21:36 ET] \n'+
-'Table \'Eulalia\' 6-max Seat #1 is the button \n \n'+
-'Seat 1: Odintsov Spb ($10 in chips)  \n'+
-'Seat 2: bengozoli ($3.75 in chips)  \n'+
-'Seat 3: liketaehoon ($11.24 in chips)  \n'+
-'Seat 4: gordo chuno ($28.31 in chips)  \n'+
-'Seat 5: ARMPOKER ($10 in chips) \n'+
-'Seat 6: justtme ($3.82 in chips) \n'+
-'bengozoli: posts small blind $0.05 \n'+
-'liketaehoon: posts big blind $0.10 \n'+
-'*** HOLE CARDS *** \n'+
-'Dealt to liketaehoon [4c 3d 6s 5d] \n'+
-'gordo chuno: raises $0.25 to $0.35 \n'+
-'ARMPOKER: folds \n'+
-'justtme: calls $0.35 \n'+
-'Odintsov Spb: folds \n'+
-'bengozoli: folds \n'+
-'liketaehoon: calls $0.25 \n'+
-'*** FLOP *** [Ad 7d 3c] \n'+
-'liketaehoon: checks \n'+
-'gordo chuno: bets $0.40 \n'+
-'justtme: calls $0.40 \n'+
-'liketaehoon: calls $0.40 \n'+
-'*** TURN *** [Ad 7d 3c] [6h] \n'+
-'liketaehoon: bets $2.20 \n'+
-'gordo chuno: calls $2.20 \n'+
-'justtme: folds \n'+
-'*** RIVER *** [Ad 7d 3c 6h] [9d] \n'+
-'liketaehoon: checks \n'+
-'gordo chuno: bets $6.42 \n'+
-'liketaehoon: calls $6.42 \n'+
-'*** SHOW DOWN *** \n'+
-'gordo chuno: shows [As 9h Ah 4s] (three of a kind, Aces) \n'+
-'liketaehoon: shows [4c 3d 6s 5d] (a flush, Ace high) \n'+
-'liketaehoon collected $18.71 from pot \n'+
-'*** SUMMARY *** \n'+
-'Total pot $19.54 | Rake $0.83 \n'+
-'Board [Ad 7d 3c 6h 9d] \n'+
-'Seat 1: Odintsov Spb (button) folded before Flop (didn\'t bet) \n'+
-'Seat 2: bengozoli (small blind) folded before Flop \n'+
-'Seat 3: liketaehoon (big blind) showed [4c 3d 6s 5d] and won ($18.71) with a flush, Ace high \n'+
-'Seat 4: gordo chuno showed [As 9h Ah 4s] and lost with three of a kind, Aces \n'+
-'Seat 5: ARMPOKER folded before Flop (didn\'t bet) \n'+
-'Seat 6: justtme folded on the Turn '
+//             'default' : 'PokerStars Zoom Hand #159780720453:  Omaha Pot Limit ($0.05/$0.10) - 2016/10/11 22:21:36 JST [2016/10/11 9:21:36 ET] \n'+
+// 'Table \'Eulalia\' 6-max Seat #1 is the button \n \n'+
+// 'Seat 1: Odintsov Spb ($10 in chips)  \n'+
+// 'Seat 2: bengozoli ($3.75 in chips)  \n'+
+// 'Seat 3: liketaehoon ($11.24 in chips)  \n'+
+// 'Seat 4: gordo chuno ($28.31 in chips)  \n'+
+// 'Seat 5: ARMPOKER ($10 in chips) \n'+
+// 'Seat 6: justtme ($3.82 in chips) \n'+
+// 'bengozoli: posts small blind $0.05 \n'+
+// 'liketaehoon: posts big blind $0.10 \n'+
+// '*** HOLE CARDS *** \n'+
+// 'Dealt to liketaehoon [4c 3d 6s 5d] \n'+
+// 'gordo chuno: raises $0.25 to $0.35 \n'+
+// 'ARMPOKER: folds \n'+
+// 'justtme: calls $0.35 \n'+
+// 'Odintsov Spb: folds \n'+
+// 'bengozoli: folds \n'+
+// 'liketaehoon: calls $0.25 \n'+
+// '*** FLOP *** [Ad 7d 3c] \n'+
+// 'liketaehoon: checks \n'+
+// 'gordo chuno: bets $0.40 \n'+
+// 'justtme: calls $0.40 \n'+
+// 'liketaehoon: calls $0.40 \n'+
+// '*** TURN *** [Ad 7d 3c] [6h] \n'+
+// 'liketaehoon: bets $2.20 \n'+
+// 'gordo chuno: calls $2.20 \n'+
+// 'justtme: folds \n'+
+// '*** RIVER *** [Ad 7d 3c 6h] [9d] \n'+
+// 'liketaehoon: checks \n'+
+// 'gordo chuno: bets $6.42 \n'+
+// 'liketaehoon: calls $6.42 \n'+
+// '*** SHOW DOWN *** \n'+
+// 'gordo chuno: shows [As 9h Ah 4s] (three of a kind, Aces) \n'+
+// 'liketaehoon: shows [4c 3d 6s 5d] (a flush, Ace high) \n'+
+// 'liketaehoon collected $18.71 from pot \n'+
+// '*** SUMMARY *** \n'+
+// 'Total pot $19.54 | Rake $0.83 \n'+
+// 'Board [Ad 7d 3c 6h 9d] \n'+
+// 'Seat 1: Odintsov Spb (button) folded before Flop (didn\'t bet) \n'+
+// 'Seat 2: bengozoli (small blind) folded before Flop \n'+
+// 'Seat 3: liketaehoon (big blind) showed [4c 3d 6s 5d] and won ($18.71) with a flush, Ace high \n'+
+// 'Seat 4: gordo chuno showed [As 9h Ah 4s] and lost with three of a kind, Aces \n'+
+// 'Seat 5: ARMPOKER folded before Flop (didn\'t bet) \n'+
+// 'Seat 6: justtme folded on the Turn '
 
           },
         ]
@@ -112,9 +112,20 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
       var rawHistory = dialog.getValueOf( 'main', 'history' ).trim();
       var detector = new PokerRoomDetector();
       var parser = detector.detect(rawHistory);
-      var data = parser.parse(rawHistory);
-      new Renderer().render(editor, main, data);
-      editor.insertElement( main );
+      if(parser === null) {
+        alert("해당 포커룸은 현재 지원하지 않습니다.\n자유게시판에 핸드히스토리를 남겨주시면 확인하겠습니다.");
+        return;
+      }
+      try {
+        var data = parser.parse(rawHistory);
+        new Renderer().render(editor, main, data);
+        editor.insertElement( main );
+      }
+      catch (e1) {
+        console.error(e1);
+        alert("핸드컨버팅중 오류가 발생했습니다.\n자유게시판에 핸드히스토리를 남겨주시면 확인하겠습니다.");
+        return;
+      }
     }
   };
 });
@@ -217,13 +228,13 @@ Renderer.prototype.render = function(editor, mainDom, data) {
   createElement(editor, 'br', '', null, mainDom);
 
   this.renderStreet(editor,mainDom, data.pots[0], data.preflop, 'PreFlop');
-  if(data.flop) {
+  if(data.flop.actions) {
     this.renderStreet(editor,mainDom, data.pots[1], data.flop, 'Flop');
   }
-  if(data.turn) {
+  if(data.turn.actions) {
     this.renderStreet(editor,mainDom, data.pots[2], data.turn, 'Turn');
   }
-  if(data.river) {
+  if(data.river.actions) {
     this.renderStreet(editor,mainDom, data.pots[3], data.river, 'River');
   }
   if(data.summary) {
@@ -479,10 +490,14 @@ Pokerstars.prototype.parse = function(history) {
   return result;
 };
 
-
 var PokerRoomDetector = function() {};
 PokerRoomDetector.prototype.detect = function(rawHistory) {
-  return new Pokerstars();
+  if (rawHistory.indexOf('PokerStars') > -1) {
+    return new Pokerstars();
+  }
+  else {
+    return null;
+  }
 };
 
 // for node unit testing
