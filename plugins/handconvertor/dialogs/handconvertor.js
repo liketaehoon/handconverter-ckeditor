@@ -51,51 +51,6 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
             label: '핸드 히스토리를 써주세요.',
             validate: CKEDITOR.dialog.validate.notEmpty( "핸드를 입력해주세요." ),
             style:'height:500px',
-//             'default' : 'PokerStars Zoom Hand #159780720453:  Omaha Pot Limit ($0.05/$0.10) - 2016/10/11 22:21:36 JST [2016/10/11 9:21:36 ET] \n'+
-// 'Table \'Eulalia\' 6-max Seat #1 is the button \n \n'+
-// 'Seat 1: Odintsov Spb ($10 in chips)  \n'+
-// 'Seat 2: bengozoli ($3.75 in chips)  \n'+
-// 'Seat 3: liketaehoon ($11.24 in chips)  \n'+
-// 'Seat 4: gordo chuno ($28.31 in chips)  \n'+
-// 'Seat 5: ARMPOKER ($10 in chips) \n'+
-// 'Seat 6: justtme ($3.82 in chips) \n'+
-// 'bengozoli: posts small blind $0.05 \n'+
-// 'liketaehoon: posts big blind $0.10 \n'+
-// '*** HOLE CARDS *** \n'+
-// 'Dealt to liketaehoon [4c 3d 6s 5d] \n'+
-// 'gordo chuno: raises $0.25 to $0.35 \n'+
-// 'ARMPOKER: folds \n'+
-// 'justtme: calls $0.35 \n'+
-// 'Odintsov Spb: folds \n'+
-// 'bengozoli: folds \n'+
-// 'liketaehoon: calls $0.25 \n'+
-// '*** FLOP *** [Ad 7d 3c] \n'+
-// 'liketaehoon: checks \n'+
-// 'gordo chuno: bets $0.40 \n'+
-// 'justtme: calls $0.40 \n'+
-// 'liketaehoon: calls $0.40 \n'+
-// '*** TURN *** [Ad 7d 3c] [6h] \n'+
-// 'liketaehoon: bets $2.20 \n'+
-// 'gordo chuno: calls $2.20 \n'+
-// 'justtme: folds \n'+
-// '*** RIVER *** [Ad 7d 3c 6h] [9d] \n'+
-// 'liketaehoon: checks \n'+
-// 'gordo chuno: bets $6.42 \n'+
-// 'liketaehoon: calls $6.42 \n'+
-// '*** SHOW DOWN *** \n'+
-// 'gordo chuno: shows [As 9h Ah 4s] (three of a kind, Aces) \n'+
-// 'liketaehoon: shows [4c 3d 6s 5d] (a flush, Ace high) \n'+
-// 'liketaehoon collected $18.71 from pot \n'+
-// '*** SUMMARY *** \n'+
-// 'Total pot $19.54 | Rake $0.83 \n'+
-// 'Board [Ad 7d 3c 6h 9d] \n'+
-// 'Seat 1: Odintsov Spb (button) folded before Flop (didn\'t bet) \n'+
-// 'Seat 2: bengozoli (small blind) folded before Flop \n'+
-// 'Seat 3: liketaehoon (big blind) showed [4c 3d 6s 5d] and won ($18.71) with a flush, Ace high \n'+
-// 'Seat 4: gordo chuno showed [As 9h Ah 4s] and lost with three of a kind, Aces \n'+
-// 'Seat 5: ARMPOKER folded before Flop (didn\'t bet) \n'+
-// 'Seat 6: justtme folded on the Turn '
-
           },
         ]
       },
@@ -283,12 +238,14 @@ CommonParser.prototype.replacePlayerName = function(text, players) {
 
 var Pokerstars = function() { this.name  = 'Pokerstars'; };
 Pokerstars.prototype = new CommonParser();
-Pokerstars.prototype.parsePot = function(history, players) {
+Pokerstars.prototype.parsePot = function(history, resultDic, players) {
 
   var result = [];
   var sum = 0.0;
 
   var splits = history.split('\n');
+  var small_blind;
+  var big_blind;
 
   for(var idx in splits) {
     var row = splits[idx];
@@ -297,21 +254,34 @@ Pokerstars.prototype.parsePot = function(history, players) {
     row = this.replacePlayerName(row, players);
 
     if (row.indexOf('posts small blind') > -1) {
-      moneys = this.regExMultiple(/\$[0-9.]*/g, row)[0];
+      moneys = this.regExMultiple(/[0-9.]+/g, row);
+      moneys = moneys[moneys.length-1];
+      small_blind = moneys;
       sum += parseFloat(moneys.replace('$',''));
     }
     else if (row.indexOf('posts big blind') > -1) {
-        moneys = this.regExMultiple(/\$[0-9.]*/g, row)[0];
-        sum += parseFloat(moneys.replace('$',''));
-        result.push(sum.toFixed(2));
+      moneys = this.regExMultiple(/[0-9.]+/g, row);
+      moneys = moneys[moneys.length-1];
+      big_blind = moneys;
+      sum += parseFloat(moneys.replace('$',''));
+    }
+    else if(row.indexOf('posts the ante') > -1) {
+      moneys = this.regExMultiple(/[0-9.]+/g, row);
+      moneys = moneys[moneys.length-1];
+      sum += parseFloat(moneys.replace('$',''));
     }
     else if(row.indexOf('raises') > -1) {
-        moneys = this.regExMultiple(/\$[0-9.]*/g, row)[1];
-        sum += parseFloat(moneys.replace('$',''));
+      moneys = this.regExMultiple(/[0-9.]+/g, row);
+      moneys = moneys[moneys.length-1];
+      sum += parseFloat(moneys.replace('$',''));
     }
     else if(row.indexOf('bets') > -1 || row.indexOf('call') > -1) {
-        moneys = this.regExMultiple(/\$[0-9.]*/g, row)[0];
-        sum += parseFloat(moneys.replace('$',''));
+      moneys = this.regExMultiple(/[0-9.]+/g, row);
+      moneys = moneys[moneys.length-1];
+      sum += parseFloat(moneys.replace('$',''));
+    }
+    else if (row.indexOf('*** HOLE CARDS ***') > -1){
+      result.push(sum.toFixed(2));
     }
     else if (row.indexOf('*** FLOP ***') > -1){
       result.push(sum.toFixed(2));
@@ -333,7 +303,14 @@ Pokerstars.prototype.parsePot = function(history, players) {
       result.push(result[result.length-1]);
     }
   }
-  return result;
+  resultDic.pots = result;
+  if(resultDic.is_tournament) {
+    resultDic.info.blinds = 't'+small_blind+'/t'+big_blind;
+  }
+  else {
+    resultDic.info.blinds = '$'+small_blind+'/$'+big_blind+'';
+  }
+  return resultDic;
 };
 
 Pokerstars.prototype.parseActions = function(rows, players) {
@@ -363,8 +340,6 @@ Pokerstars.prototype.parseBoard = function(row) {
 };
 Pokerstars.prototype.parse = function(history) {
 
-  console.log(history);
-
   var result = {};
   result.preflop = {};
   result.flop = {};
@@ -373,13 +348,13 @@ Pokerstars.prototype.parse = function(history) {
   result.summary = {};
   result.summary.results = [];
   result.raw = history;
+  result.is_tournament = history.indexOf('Tournament') > 0;
   var dealt_text = /Dealt to .* \[/g.exec(history)[0];
   var heroname = dealt_text.substring(0,dealt_text.length-1).replace('Dealt to ','').trim();
-  var smallplayer = /.*: posts small blind \$[0-9.]*/g.exec(history)[0];
+  var smallplayer = /.*: posts small blind/g.exec(history)[0];
   smallplayer = smallplayer.substring(0,smallplayer.indexOf(':')).trim();
 
-  var blinds =/\$[0-9.]*\/\$[0-9.]*/g.exec(history)[0];
-  var seats = this.regExMultiple(/Seat [1-9]:.*\(\$[0-9.]* in chips\)/g, history);
+  var seats = this.regExMultiple(/Seat [1-9]:.*\([\$0-9.]+ in chips\)/g, history);
 
   var players = [];
   var postflop_txt = history.substring(history.indexOf('*** FLOP'), history.indexOf('*** SUMMARY'));
@@ -387,8 +362,8 @@ Pokerstars.prototype.parse = function(history) {
   for (var seatIdx in seats) {
     var seat = seats[seatIdx];
     var player = {};
-    player.stack = /\$[0-9.]*/g.exec(seat)[0];
-    player.name=seat.substring(8,seat.indexOf('(')).trim();
+    player.stack = /[\$0-9.]+/g.exec(seat.substring(seat.lastIndexOf('('), seat.length))[0];
+    player.name=seat.substring(8,seat.lastIndexOf('(')).trim();
     player.is_hero = player.name == heroname;
     if(history.indexOf('*** FLOP') > -1) {
       player.has_action = postflop_txt.indexOf(player.name) > -1; // look into other history
@@ -418,7 +393,7 @@ Pokerstars.prototype.parse = function(history) {
     }
   }
 
-  result.info = { blinds : blinds, player_number : seats.length};
+  result.info = { player_number : seats.length};
   result.players = players;
 
   // preflop
@@ -451,8 +426,7 @@ Pokerstars.prototype.parse = function(history) {
     result.river.actions = this.parseActions(riverrows.slice(1,riverrows.length), result.players);
   }
 
-  // pot calcuration
-  result.pots = this.parsePot(history, players);
+  result = this.parsePot(history, result, players);
 
   var summarytext = history.substring(history.indexOf('*** SUMMARY'), history.length);
 
@@ -486,7 +460,9 @@ Pokerstars.prototype.parse = function(history) {
       result.summary.results.push({ content : txt.trim()});
     }
   }
-  result.summary.results.push({ content : this.regExMultiple(/Rake \$[0-9.]*/g, summarytext)[0] });
+  if(result.is_tournament === false) {
+    result.summary.results.push({ content : this.regExMultiple(/Rake \$[0-9.]*/g, summarytext)[0] });
+  }
   return result;
 };
 

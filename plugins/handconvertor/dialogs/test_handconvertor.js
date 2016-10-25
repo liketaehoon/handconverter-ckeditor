@@ -453,6 +453,17 @@ module.exports = {
 			catch (e1) {
 				console.log(e1);
 			}
+			test.equal(result.info.blinds, '$0.05/$0.10');
+
+			test.equal(result.pots.length, 5);
+			if(result.pots.length == 5) {
+				test.equal(result.pots[0], 0.25); // pre
+				test.equal(result.pots[1], 1.00); // flop
+				test.equal(result.pots[2], 1.00); // turn
+				test.equal(result.pots[3], 2.92); // river
+				test.equal(result.pots[4], 2.92); // final
+			}
+
 			test.ok(result !== null);
 			test.done();
 	},
@@ -462,14 +473,105 @@ module.exports = {
 			test.ok(parser !== null);
 			test.equal(parser.name , 'Pokerstars');
 
-			var result = null;
-			try {
-				result = parser.parse(history);
+			var result = parser.parse(history);
+
+			test.equal(result.info.blinds, 't150/t300');
+			test.equal(result.info.player_number, 9);
+			test.equal(result.players.length,9);
+
+			test.equal(result.players[0].name, 'bomberx41');
+			test.equal(result.players[0].stack, '4993');
+			test.equal(result.players[0].position, 'MP');
+			test.equal(result.players[0].is_hero, false);
+			test.equal(result.players[0].has_action, false);
+
+			test.equal(result.players[1].name, 'CynOpt');
+			test.equal(result.players[1].stack, '3674');
+			test.equal(result.players[1].position, 'MP+1');
+			test.equal(result.players[1].is_hero, false);
+			test.equal(result.players[1].has_action, true);
+
+
+			test.equal(result.players[2].name, 'liketaehoon');
+			test.equal(result.players[2].stack, '1050');
+			test.equal(result.players[2].position, 'MP+2');
+			test.equal(result.players[2].is_hero, true);
+			test.equal(result.players[2].has_action, true);
+
+
+			test.equal(result.players[3].name, 'daandijk');
+			test.equal(result.players[3].stack, '13135');
+			test.equal(result.players[3].position, 'CO');
+			test.equal(result.players[3].is_hero, false);
+			test.equal(result.players[3].has_action, false);
+
+			test.equal(result.players[4].name, 'NesKau09');
+			test.equal(result.players[4].stack, '15888');
+			test.equal(result.players[4].position, 'BN');
+			test.equal(result.players[4].is_hero, false);
+			test.equal(result.players[4].has_action, false);
+
+
+			test.equal(result.players[5].name, 'Fuzzybear666');
+			test.equal(result.players[5].stack, '9504');
+			test.equal(result.players[5].position, 'SB');
+			test.equal(result.players[5].is_hero, false);
+			test.equal(result.players[5].has_action, false);
+
+			test.equal(result.players[6].name, 'cumil87');
+			test.equal(result.players[6].stack, '3798');
+			test.equal(result.players[6].position, 'BB');
+			test.equal(result.players[6].is_hero, false);
+			test.equal(result.players[6].has_action, false);
+
+			test.equal(result.players[7].name, 'maxmax74');
+			test.equal(result.players[7].stack, '6270');
+			test.equal(result.players[7].position, 'UTG');
+			test.equal(result.players[7].is_hero, false);
+			test.equal(result.players[7].has_action, false);
+
+			test.equal(result.players[8].name, 'Evgeny_nsk');
+			test.equal(result.players[8].stack, '8275');
+			test.equal(result.players[8].position, 'UTG+1');
+			test.equal(result.players[8].is_hero, false);
+			test.equal(result.players[8].has_action, false);
+
+			test.equal(result.preflop.hero_position,'MP+2');
+			test.equal(result.preflop.hero_holecard,'7d Ks');
+			test.equal(result.preflop.actions.length,10);
+			test.equal(result.preflop.actions[0].content, "UTG folds");
+			test.equal(result.preflop.actions[1].content, "UTG+1 folds");
+			test.equal(result.preflop.actions[2].content, "MP folds");
+			test.equal(result.preflop.actions[3].content, "MP+1 raises to 750");
+			test.equal(result.preflop.actions[4].content, "Hero raises to 1010 and is all-in");
+			test.equal(result.preflop.actions[5].content, "CO folds");
+			test.equal(result.preflop.actions[6].content, "BN folds");
+			test.equal(result.preflop.actions[7].content, "SB folds");
+			test.equal(result.preflop.actions[8].content, "BB folds");
+			test.equal(result.preflop.actions[9].content, "MP+1 calls 260");
+
+			test.equal(result.flop.boards, '9d 3h 3c');
+			test.equal(result.turn.boards, '9d 3h 3c 9c');
+			test.equal(result.river.boards, '9d 3h 3c 9c Jd');
+
+			test.equal(result.flop.actions.length, 0 );
+			test.equal(result.turn.actions.length, 0 );
+			test.equal(result.river.actions.length, 0 );
+
+
+			test.equal(result.summary.results.length,2);
+			if(result.summary.results.length == 2) {
+				test.equal(result.summary.results[0].content, "MP+1 won (2830) with a full house, Nines full of Threes");
+				test.equal(result.summary.results[1].content, "Hero lost with two pair, Nines and Threes");
 			}
-			catch (e1) {
-				console.log(e1);
+			test.equal(result.pots.length, 5);
+			if(result.pots.length == 5) {
+				test.equal(result.pots[0], 810); // pre
+				test.equal(result.pots[1], 2830); // flop
+				test.equal(result.pots[2], 2830); // turn
+				test.equal(result.pots[3], 2830); // river
+				test.equal(result.pots[4], 2830); // final
 			}
-			test.ok(result !== null);
 			test.done();
 	},
 	// testACRNLHE : function(test) {
