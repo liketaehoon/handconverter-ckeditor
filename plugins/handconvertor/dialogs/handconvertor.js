@@ -108,11 +108,16 @@ Renderer.prototype.renderCards = function(editor, dom, holecards) {
   }
 };
 
-Renderer.prototype.renderStreet = function(editor, dom, pot, streetData, streetName) {
+Renderer.prototype.renderStreet = function(editor, dom, is_tournament, pot, streetData, streetName) {
   var section = createElement(editor, 'div', 'section', null, dom);
   var street = createElement(editor, 'div', 'street', null, section);
   createElement(editor, 'span', 'street-title', streetName, street);
-  createElement(editor, 'span', 'street-money', "($"+pot+")", street);
+  if(is_tournament) {
+    createElement(editor, 'span', 'street-money', "("+pot+")", street);
+  }
+  else {
+    createElement(editor, 'span', 'street-money', "($"+pot+")", street);
+  }
 
   if(streetData.hero_holecard) {
     var heroHoleCard =  createElement(editor, 'span', '', null, street);
@@ -182,15 +187,15 @@ Renderer.prototype.render = function(editor, mainDom, data) {
   }
   createElement(editor, 'br', '', null, mainDom);
 
-  this.renderStreet(editor,mainDom, data.pots[0], data.preflop, 'PreFlop');
+  this.renderStreet(editor,mainDom, data.is_tournament, data.pots[0], data.preflop, 'PreFlop');
   if(data.flop.actions) {
-    this.renderStreet(editor,mainDom, data.pots[1], data.flop, 'Flop');
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.flop, 'Flop');
   }
   if(data.turn.actions) {
-    this.renderStreet(editor,mainDom, data.pots[2], data.turn, 'Turn');
+    this.renderStreet(editor,mainDom, data.is_tournament,  data.pots[2], data.turn, 'Turn');
   }
   if(data.river.actions) {
-    this.renderStreet(editor,mainDom, data.pots[3], data.river, 'River');
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[3], data.river, 'River');
   }
   if(data.summary) {
     var section = createElement(editor, 'div', 'section', null, mainDom);
