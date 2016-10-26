@@ -78,6 +78,7 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
       }
       catch (e1) {
         console.error(e1);
+        console.error(e1.stack);
         alert("핸드컨버팅중 오류가 발생했습니다.\n자유게시판에 핸드히스토리를 남겨주시면 확인하겠습니다.");
         return;
       }
@@ -196,6 +197,24 @@ Renderer.prototype.render = function(editor, mainDom, data) {
   }
   if(data.river.actions) {
     this.renderStreet(editor,mainDom, data.is_tournament, data.pots[3], data.river, 'River');
+  }
+  if(data.firstFlop) {
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.firstFlop, 'First Flop');
+  }
+  if(data.firstTurn) {
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.firstTurn, 'First Turn');
+  }
+  if(data.firstRiver) {
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.firstRiver, 'First River');
+  }
+  if(data.secondFlop) {
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.secondFlop, 'Second Flop');
+  }
+  if(data.secondTurn) {
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.secondTurn, 'Second Turn');
+  }
+  if(data.secondRiver) {
+    this.renderStreet(editor,mainDom, data.is_tournament, data.pots[1], data.secondRiver, 'Second River');
   }
   if(data.summary) {
     var section = createElement(editor, 'div', 'section', null, mainDom);
@@ -429,6 +448,31 @@ Pokerstars.prototype.parse = function(history) {
     var riverrows = rivertext.split('\n');
     result.river.boards = this.parseBoard(riverrows[0]);
     result.river.actions = this.parseActions(riverrows.slice(1,riverrows.length), result.players);
+  }
+
+  if(history.indexOf('*** FIRST FLOP') > 0) {
+      var firstFlopTxt = this.regExMultiple(/\*\*\* FIRST FLOP.*/g, history)[0];
+      result.firstFlop = { boards : this.parseBoard(firstFlopTxt), actions : []};
+  }
+  if(history.indexOf('*** FIRST TURN') > 0) {
+      var firstTurnTxt = this.regExMultiple(/\*\*\* FIRST TURN.*/g, history)[0];
+      result.firstTurn = { boards : this.parseBoard(firstTurnTxt), actions : []};
+  }
+  if(history.indexOf('*** FIRST RIVER') > 0) {
+      var firstRiver = this.regExMultiple(/\*\*\* FIRST RIVER.*/g, history)[0];
+      result.firstRiver = { boards : this.parseBoard(firstRiver), actions : []};
+  }
+  if(history.indexOf('*** SECOND FLOP') > 0) {
+      var secondFlopTxt = this.regExMultiple(/\*\*\* SECOND FLOP.*/g, history)[0];
+      result.secondFlop = { boards : this.parseBoard(secondFlopTxt), actions : []};
+  }
+  if(history.indexOf('*** SECOND TURN') > 0) {
+      var secondTurnTxt = this.regExMultiple(/\*\*\* SECOND TURN.*/g, history)[0];
+      result.secondTurn = { boards : this.parseBoard(secondTurnTxt), actions : []};
+  }
+  if(history.indexOf('*** SECOND RIVER') > 0) {
+      var secondRiver = this.regExMultiple(/\*\*\* SECOND RIVER.*/g, history)[0];
+      result.secondRiver = { boards : this.parseBoard(secondRiver), actions : []};
   }
 
   result = this.parsePot(history, result, players);
