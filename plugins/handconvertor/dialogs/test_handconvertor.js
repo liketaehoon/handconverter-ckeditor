@@ -499,7 +499,7 @@ module.exports = {
 			test.equal(result.players[2].has_action, true);
 
 
-			test.equal(result.players[3].name, 'daandijk');
+			test.equal(result.players[3].name, 'daandijk()');
 			test.equal(result.players[3].stack, '13135');
 			test.equal(result.players[3].position, 'CO');
 			test.equal(result.players[3].is_hero, false);
@@ -518,7 +518,7 @@ module.exports = {
 			test.equal(result.players[5].is_hero, false);
 			test.equal(result.players[5].has_action, false);
 
-			test.equal(result.players[6].name, 'cumil87');
+			test.equal(result.players[6].name, 'cum!@#$%^&*()');
 			test.equal(result.players[6].stack, '3798');
 			test.equal(result.players[6].position, 'BB');
 			test.equal(result.players[6].is_hero, false);
@@ -563,6 +563,9 @@ module.exports = {
 			if(result.summary.results.length == 2) {
 				test.equal(result.summary.results[0].content, "MP+1 won (2830) with a full house, Nines full of Threes");
 				test.equal(result.summary.results[1].content, "Hero lost with two pair, Nines and Threes");
+
+				test.equal(result.summary.results[0].holecards, '9h Ad');
+				test.equal(result.summary.results[1].holecards, '7d Ks');
 			}
 			test.equal(result.pots.length, 5);
 			if(result.pots.length == 5) {

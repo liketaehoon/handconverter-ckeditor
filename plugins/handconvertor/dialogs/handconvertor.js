@@ -89,7 +89,13 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
 });
 
 var Renderer = function() {};
-Renderer.prototype.renderCards = function(editor, dom, holecards) {
+Renderer.prototype.renderCards = function(editor, dom, holecards, bracket) {
+
+  bracket = bracket || false;
+
+  if(bracket) {
+      dom.appendHtml(' (');
+  }
 
   var splits = holecards.split(' ');
   for(var idx in splits) {
@@ -108,6 +114,10 @@ Renderer.prototype.renderCards = function(editor, dom, holecards) {
         createElement(editor,'span', 'card-value spade', card[0], dom);
         break;
     }
+  }
+
+  if(bracket) {
+      dom.appendHtml(')');
   }
 };
 
@@ -149,7 +159,7 @@ Renderer.prototype.renderActions = function(editor, dom, actions) {
     else if(action.content.indexOf('raises') > -1) {
       actionClass = 'street-action primary';
     }
-    
+
     var position = action.content.substring(0,action.content.indexOf(' '));
     var actionTxt = action.content.substring(action.content.indexOf(' '), action.content.length);
 
@@ -224,6 +234,9 @@ Renderer.prototype.render = function(editor, mainDom, data) {
     for(var summaryIdx in data.summary.results) {
       var result = data.summary.results[summaryIdx];
       createElement(editor,'span', 'street-action', result.content, street);
+      if(result.holecards) {
+        this.renderCards(editor,street, result.holecards, true);
+      }
       createElement(editor,'br', '', null, street);
     }
   }
@@ -507,7 +520,13 @@ Pokerstars.prototype.parse = function(history) {
       else if(summaryrow.indexOf('collected') > -1) {
         txt += summaryrow.substring(summaryrow.indexOf('collected'), summaryrow.length) ;
       }
-      result.summary.results.push({ content : txt.trim()});
+
+      var entry = {content : txt.trim()};
+      var hands = this.regExMultiple(/\[[0-9A-z ]*\]/g, summaryrow);
+      if(hands.length > 0) {
+        entry.holecards = this.parseBoard(hands[0]);
+      }
+      result.summary.results.push(entry);
     }
   }
   if(result.is_tournament === false) {
