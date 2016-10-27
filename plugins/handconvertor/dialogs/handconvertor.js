@@ -63,7 +63,7 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
 
 
 
-      var supermain = createElement(editor, 'main', 'hand-content', null, null);
+      var supermain = createElement(editor, 'div', 'hand-content', null, null);
       var main = createElement(editor, 'section', 'hand-content', null, supermain);
       var handHistory = createElement(editor, 'div', 'hand-history', null, main);
       var rawHistory = dialog.getValueOf( 'main', 'history' ).trim();
