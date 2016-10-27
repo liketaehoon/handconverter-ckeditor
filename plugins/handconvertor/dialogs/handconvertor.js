@@ -62,7 +62,9 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
       globalDialog = dialog;
 
 
-      var main = createElement(editor, 'section', 'hand-content', null, null);
+
+      var supermain = createElement(editor, 'main', 'hand-content', null, null);
+      var main = createElement(editor, 'section', 'hand-content', null, supermain);
       var handHistory = createElement(editor, 'div', 'hand-history', null, main);
       var rawHistory = dialog.getValueOf( 'main', 'history' ).trim();
       var detector = new PokerRoomDetector();
@@ -74,7 +76,7 @@ CKEDITOR.dialog.add( 'hcDialog', function( editor ) {
       try {
         var data = parser.parse(rawHistory);
         new Renderer().render(editor, main, data);
-        editor.insertElement( main );
+        editor.insertElement( supermain );
       }
       catch (e1) {
         console.error(e1);
@@ -140,15 +142,14 @@ Renderer.prototype.renderActions = function(editor, dom, actions) {
     var action = actions[idx];
     var is_primary = false;
     var actionClass = 'street-action';
-    if(action.content.indexOf('Hero') > -1) {
-      actionClass = 'street-action';
-    }
-    else if(action.content.indexOf('bet') > -1) {
+
+    if(action.content.indexOf('bet') > -1) {
       actionClass = 'street-action primary';
     }
     else if(action.content.indexOf('raises') > -1) {
       actionClass = 'street-action primary';
     }
+    
     var position = action.content.substring(0,action.content.indexOf(' '));
     var actionTxt = action.content.substring(action.content.indexOf(' '), action.content.length);
 

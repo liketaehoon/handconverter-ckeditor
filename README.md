@@ -38,3 +38,18 @@ For example:
 
 	http://www.example.com/ckeditor/samples/index.html
 # handconverter-ckeditor
+
+
+
+/www_root/xe/common/js/plugins/ckeditor/ckeditor/plugins
+/www_root/xe/modules/editor/skins/ckeditor/editor.html
+
+                <!--@if(!FileHandler::exists('common/js/plugins/ckeditor/ckeditor/config.js'))-->CKEDITOR.config.customConfig = '';<!--@endif-->
+
+
+                common/js/plugins/ckeditor/ckeditor/plugins/handconvertor/styles/handconverter.css
+
+
+
+-- final pot holecards
+-- hero action red
